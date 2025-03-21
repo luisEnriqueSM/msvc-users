@@ -7,7 +7,7 @@ import com.luis.springcloud.msvc.users.entities.User;
 public interface UserService {
 
     Optional<User> findById(Long id);
-    User findByUsername(String username);
+    Optional<User> findByUsername(String username);
     Iterable<User> findAll();
     User save(User user);
     void delete(Long id);
