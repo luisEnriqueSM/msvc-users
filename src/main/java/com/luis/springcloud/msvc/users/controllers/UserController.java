@@ -37,7 +37,7 @@ public class UserController {
             userDB.setEmail(user.getEmail());
             userDB.setUsername(user.getUsername());
             userDB.setEnabled(user.isEnabled());
-            return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.save(user));
+            return ResponseEntity.status(HttpStatus.OK).body(this.userService.save(userDB));
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
