@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService{
     public User save(User user) {
         user.setRoles(getRoles(user));
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+        user.setEnabled(true);
         return this.userRepository.save(user);
     }
 
@@ -55,7 +56,11 @@ public class UserServiceImpl implements UserService{
         return userOptional.map(userDB -> {
             userDB.setEmail(user.getEmail());
             userDB.setUsername(user.getUsername());
-            Optional.ofNullable(user.isEnabled()).ifPresent(userDB::setEnabled);
+            if(user.isEnabled() == null){
+                userDB.setEnabled(true);
+            } else {
+                userDB.setEnabled(user.isEnabled());
+            }
             userDB.setRoles(getRoles(user));
             return Optional.of(this.userRepository.save(userDB));
         }).orElseGet(() -> Optional.empty()); 
