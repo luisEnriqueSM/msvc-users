@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public User save(User user) {
-        user.setRoles(getRoles());
+        user.setRoles(getRoles(user));
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         return this.userRepository.save(user);
     }
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService{
             userDB.setEmail(user.getEmail());
             userDB.setUsername(user.getUsername());
             Optional.ofNullable(user.isEnabled()).ifPresent(userDB::setEnabled);
-            userDB.setRoles(getRoles());
+            userDB.setRoles(getRoles(user));
             return Optional.of(this.userRepository.save(userDB));
         }).orElseGet(() -> Optional.empty()); 
     }
@@ -73,10 +73,15 @@ public class UserServiceImpl implements UserService{
         return this.userRepository.findAll();
     }
 
-    private List<Role> getRoles() {
+    private List<Role> getRoles(User user) {
         List<Role> roles = new ArrayList<>();
         Optional<Role> roleOptional = this.roleRepository.findByName("ROLE_USER");
-        roleOptional.ifPresent(role -> roles.add(role));
+        roleOptional.ifPresent(roles::add);
+
+        if(user.isAdmin()){
+            Optional<Role> adminOptional = this.roleRepository.findByName("ROLE_ADMIN");
+            adminOptional.ifPresent(roles::add);
+        }
         return roles;
     }
 
