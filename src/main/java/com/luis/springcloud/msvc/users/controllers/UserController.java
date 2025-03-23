@@ -31,22 +31,19 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<User> update(@RequestBody User user, @PathVariable Long id){
-        Optional<User> userOptional = this.userService.update(user, id);
-        return userOptional.map(userUpdated -> ResponseEntity.ok().body(userUpdated))
+        return this.userService.update(user, id).map(userUpdated -> ResponseEntity.ok().body(userUpdated))
                     .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id){
-        Optional<User> user = this.userService.findById(id);
-        return user.map(ResponseEntity::ok)
+        return this.userService.findById(id).map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/username/{username}")
     public ResponseEntity<User> getUserByUserName(@PathVariable String username){
-        Optional<User> user = this.userService.findByUsername(username);
-        return user.map(ResponseEntity::ok)
+        return this.userService.findByUsername(username).map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
