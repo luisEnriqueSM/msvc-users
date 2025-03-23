@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,13 +20,16 @@ import com.luis.springcloud.msvc.users.services.UserService;
 public class UserController {
 
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     public UserController(UserService userService) {
         this.userService = userService;
+        this.passwordEncoder = null;
     }
 
     @PostMapping
     public ResponseEntity<User> create(@RequestBody User user){
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.save(user));
     }
 
@@ -36,7 +40,9 @@ public class UserController {
         return userOptional.map(userDB -> {
             userDB.setEmail(user.getEmail());
             userDB.setUsername(user.getUsername());
-            userDB.setEnabled(user.isEnabled());
+            if(user.isEnabled() != null){
+                userDB.setEnabled(user.isEnabled());
+            }
             return ResponseEntity.status(HttpStatus.OK).body(this.userService.save(userDB));
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
