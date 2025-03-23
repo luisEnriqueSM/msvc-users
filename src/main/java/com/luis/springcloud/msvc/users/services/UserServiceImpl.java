@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +20,12 @@ public class UserServiceImpl implements UserService{
 
     private final RoleRepository roleRepository;
 
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -39,11 +43,22 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public User save(User user) {
-        List<Role> roles = new ArrayList<>();
-        Optional<Role> roleOptional = this.roleRepository.findByName("ROLE_USER");
-        roleOptional.ifPresent(role -> roles.add(role));
-        user.setRoles(roles);
+        user.setRoles(getRoles());
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         return this.userRepository.save(user);
+    }
+
+    @Override
+    public Optional<User> update(User user, Long id) {
+        Optional<User> userOptional = this.findById(id);
+
+        return userOptional.map(userDB -> {
+            userDB.setEmail(user.getEmail());
+            userDB.setUsername(user.getUsername());
+            Optional.ofNullable(user.isEnabled()).ifPresent(userDB::setEnabled);
+            userDB.setRoles(getRoles());
+            return Optional.of(this.userRepository.save(userDB));
+        }).orElseGet(() -> Optional.empty()); 
     }
 
     @Override
@@ -56,6 +71,13 @@ public class UserServiceImpl implements UserService{
     @Transactional(readOnly = true)
     public Iterable<User> findAll() {
         return this.userRepository.findAll();
+    }
+
+    private List<Role> getRoles() {
+        List<Role> roles = new ArrayList<>();
+        Optional<Role> roleOptional = this.roleRepository.findByName("ROLE_USER");
+        roleOptional.ifPresent(role -> roles.add(role));
+        return roles;
     }
 
 }
