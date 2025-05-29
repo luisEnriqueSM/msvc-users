@@ -28,3 +28,15 @@ docker build -t zipkin-server:v1 .
 
 # Correr contenedor Zipkin
 docker run -d -p 9411:9411 --name zipkin-server --network springcloud -e STORAGE_TYPE=mysql -e MYSQL_USER=zipkin -e MYSQL_PASS=zipkin -e MYSQL_HOST=mysql8 zipkin-server:v1
+```
+
+## Componentes de relacionados de la solución:
+
+- ### msvc-eureka-server: https://github.com/luisEnriqueSM/msvc-eureka-server
+- ### msvc-products: https://github.com/luisEnriqueSM/msvc-products
+- ### msvc-items: https://github.com/luisEnriqueSM/msvc-items
+- ### msvc-gateway-server: https://github.com/luisEnriqueSM/msvc-gateway-server
+- ### msvc-oauth: https://github.com/luisEnriqueSM/msvc-oauth
+- ### msvc-users: https://github.com/luisEnriqueSM/msvc-users
+- ### msvc-config-server: https://github.com/luisEnriqueSM/msvc-config-server
+- ### msvc-docker-compose: https://github.com/luisEnriqueSM/msvc-docker-compose
